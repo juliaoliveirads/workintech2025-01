@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jogo da Velha</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
+  <h1 class="text-3xl font-bold mb-4">Jogo da Velha</h1>
+
+  <div class="flex space-x-8 mb-6">
+    <div class="text-blue-600 font-semibold text-xl">Pontuação O: <span id="scoreO">0</span></div>
+    <div class="text-red-600 font-semibold text-xl">Pontuação X: <span id="scoreX">0</span></div>
+  </div>
+
+  <div id="board" class="grid grid-cols-3 gap-2">
+    <!-- 9 células -->
+    <button class="w-24 h-24 text-4xl font-bold bg-white border-2 border-gray-400" data-cell></button>
+    <button class="w-24 h-24 text-4xl font-bold bg-white border-2 border-gray-400" data-cell></button>
+    <button class="w-24 h-24 text-4xl font-bold bg-white border-2 border-gray-400" data-cell></button>
+    <button class="w-24 h-24 text-4xl font-bold bg-white border-2 border-gray-400" data-cell></button>
+    <button class="w-24 h-24 text-4xl font-bold bg-white border-2 border-gray-400" data-cell></button>
+    <button class="w-24 h-24 text-4xl font-bold bg-white border-2 border-gray-400" data-cell></button>
+    <button class="w-24 h-24 text-4xl font-bold bg-white border-2 border-gray-400" data-cell></button>
+    <button class="w-24 h-24 text-4xl font-bold bg-white border-2 border-gray-400" data-cell></button>
+    <button class="w-24 h-24 text-4xl font-bold bg-white border-2 border-gray-400" data-cell></button>
+  </div>
+
+  <button id="resetBtn" class="mt-6 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600">Reiniciar Jogo</button>
+
+  <script>
+    const board = document.querySelectorAll('[data-cell]');
+    const scoreXEl = document.getElementById('scoreX');
+    const scoreOEl = document.getElementById('scoreO');
+    const resetBtn = document.getElementById('resetBtn');
+
+    let currentPlayer = 'X';
+    let gameActive = true;
+    let scoreX = 0;
+    let scoreO = 0;
+
+    const winPatterns = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6]
+    ];
+
+    function checkWin() {
+      return winPatterns.some(pattern => {
+        const [a, b, c] = pattern;
+        return board[a].textContent &&
+               board[a].textContent === board[b].textContent &&
+               board[a].textContent === board[c].textContent;
+      });
+    }
+
+    function checkDraw() {
+      return [...board].every(cell => cell.textContent);
+    }
+
+    function handleClick(e) {
+      const cell = e.target;
+      if (cell.textContent || !gameActive) return;
+
+      cell.textContent = currentPlayer;
+      cell.classList.add(currentPlayer === 'X' ? 'text-red-600' : 'text-blue-600');
+
+      if (checkWin()) {
+        gameActive = false;
+        if (currentPlayer === 'X') {
+          scoreX++;
+          scoreXEl.textContent = scoreX;
+        } else {
+          scoreO++;
+          scoreOEl.textContent = scoreO;
+        }
+        return;
+      }
+
+      if (checkDraw()) {
+        gameActive = false;
+        return;
+      }
+
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    }
+
+    function resetBoard() {
+      board.forEach(cell => {
+        cell.textContent = '';
+        cell.classList.remove('text-red-600', 'text-blue-600');
+      });
+      currentPlayer = 'X';
+      gameActive = true;
+    }
+
+    board.forEach(cell => cell.addEventListener('click', handleClick));
+    resetBtn.addEventListener('click', resetBoard);
+  </script>
+</body>
+</html>
